@@ -1,8 +1,8 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lesson-3", "Lesson-3\Lesson-3.csproj", "{78A7CA66-ECF7-4DDD-B549-FC26CA298371}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lesson-3", "src\Lesson-3\Lesson-3.csproj", "{78A7CA66-ECF7-4DDD-B549-FC26CA298371}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lesson-3.Tests", "Lesson-3.Tests\Lesson-3.Tests.csproj", "{207BE860-BA03-48E7-9663-CE838F4EB9B1}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lesson-3.Tests", "src\Lesson-3.Tests\Lesson-3.Tests.csproj", "{207BE860-BA03-48E7-9663-CE838F4EB9B1}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Lesson-3", "Lesson-3", "{A9A05C91-6C33-482E-BB0D-9150E1D0D2C8}"
 EndProject
