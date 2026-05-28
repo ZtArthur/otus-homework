@@ -1,11 +1,6 @@
 ﻿<wpf:ResourceDictionary xml:space="preserve" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:s="clr-namespace:System;assembly=mscorlib" xmlns:ss="urn:shemas-jetbrains-com:settings-storage-xaml" xmlns:wpf="http://schemas.microsoft.com/winfx/2006/xaml/presentation">
 	<s:String x:Key="/Default/CodeInspection/ExcludedFiles/FilesAndFoldersToSkip2/=7020124F_002D9FFC_002D4AC3_002D8F3D_002DAAB8E0240759_002Ff_003AInsertionBehavior_002Ecs_002Fl_003AC_0021_003FUsers_003Fazoti_003FAppData_003FRoaming_003FJetBrains_003FRider2025_002E2_003Fresharper_002Dhost_003FSourcesCache_003F1d9d4154cb5149b3833872f7b9c854cce8e728_003F_005F4a0c5_003FInsertionBehavior_002Ecs/@EntryIndexedValue">ForceIncluded</s:String>
+	<s:String x:Key="/Default/CodeInspection/ExcludedFiles/FilesAndFoldersToSkip2/=7020124F_002D9FFC_002D4AC3_002D8F3D_002DAAB8E0240759_002Ff_003ASocket_002Ecs_002Fl_003AC_0021_003FUsers_003Fazoti_003FAppData_003FRoaming_003FJetBrains_003FRider2025_002E2_003Fresharper_002Dhost_003FSourcesCache_003F4f21b49fd9a46b26387bb4918d78aeb486af1c1fcddfd3862c94892d76a5df_003FSocket_002Ecs/@EntryIndexedValue">ForceIncluded</s:String>
 	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=40dbd5f1_002D3765_002D40c2_002Dbd01_002Db992547ea1af/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" IsActive="True" Name="should_return_command_with_arguments" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
-  &lt;TestAncestor&gt;&#xD;
-    &lt;TestId&gt;xUnit::207BE860-BA03-48E7-9663-CE838F4EB9B1::net9.0::Lesson_3.Tests.CommandParserTests.should_return_two_arguments_when_parsing_get_command&lt;/TestId&gt;&#xD;
-    &lt;TestId&gt;xUnit::207BE860-BA03-48E7-9663-CE838F4EB9B1::net9.0::Lesson_3.Tests.CommandParserTests.should_return_three_arguments_when_parsing_set_command&lt;/TestId&gt;&#xD;
-    &lt;TestId&gt;xUnit::207BE860-BA03-48E7-9663-CE838F4EB9B1::net9.0::Lesson_3.Tests.CommandParserTests.should_return_empty_when_parsing_command_without_key&lt;/TestId&gt;&#xD;
-    &lt;TestId&gt;xUnit::207BE860-BA03-48E7-9663-CE838F4EB9B1::net9.0::Lesson_3.Tests.CommandParserTests.should_return_empty_when_parsing_command_without_any&lt;/TestId&gt;&#xD;
-    &lt;TestId&gt;xUnit::207BE860-BA03-48E7-9663-CE838F4EB9B1::net9.0::Lesson_3.Tests.CommandParserTests.should_return_three_arguments_when_parsing_set_command_with_whitespaces&lt;/TestId&gt;&#xD;
-  &lt;/TestAncestor&gt;&#xD;
+  &lt;ProjectFile&gt;2FCD2143-F050-4F0B-A0D9-68CF03340D8A/f:CommandParserTests.cs&lt;/ProjectFile&gt;&#xD;
 &lt;/SessionState&gt;</s:String></wpf:ResourceDictionary>
