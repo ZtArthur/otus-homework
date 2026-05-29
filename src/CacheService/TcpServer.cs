@@ -18,7 +18,7 @@ public class TcpServer
         _port = port;
     }
 
-    public async Task StartAsync()
+    public async Task StartAsync(CancellationToken cancellationToken = default)
     {
         var serverEndpoint = new IPEndPoint(IPAddress.Parse(_host), _port);
         using var serverSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
@@ -26,24 +26,24 @@ public class TcpServer
         serverSocket.Bind(serverEndpoint);
         serverSocket.Listen();
 
-        while (true)
+        while (!cancellationToken.IsCancellationRequested)
         {
-            using var clientSocket = await serverSocket.AcceptAsync();
+            var clientSocket = await serverSocket.AcceptAsync(cancellationToken);
 
-            _ = ProcessClientAsync(clientSocket);
+            _ = Task.Run(() => ProcessClientAsync(clientSocket, cancellationToken), cancellationToken);
         }
     }
 
-    private static async Task ProcessClientAsync(Socket clientSocket)
+    private static async Task ProcessClientAsync(Socket clientSocket, CancellationToken cancellationToken)
     {
         var arrayPool = ArrayPool<byte>.Shared;
 
         var array = arrayPool.Rent(minimumLength: 1024);
         try
         {
-            while (true)
+            while (!cancellationToken.IsCancellationRequested)
             {
-                var length = await clientSocket.ReceiveAsync(array);
+                var length = await clientSocket.ReceiveAsync(array, cancellationToken);
 
                 if (length == 0)
                 {
