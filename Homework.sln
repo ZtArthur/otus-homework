@@ -4,6 +4,13 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CacheService", "src\CacheSe
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CacheService.Tests", "tests\CacheService.Tests\CacheService.Tests.csproj", "{2FCD2143-F050-4F0B-A0D9-68CF03340D8A}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{088AAA34-DE0D-4E5F-B864-4FC7F85FCAE4}"
+	ProjectSection(SolutionItems) = preProject
+		Lesson_3.md = Lesson_3.md
+		Lesson_6.md = Lesson_6.md
+		Lesson_9.md = Lesson_9.md
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
