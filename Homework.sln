@@ -9,6 +9,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{088AAA34-D
 		Lesson_3.md = Lesson_3.md
 		Lesson_6.md = Lesson_6.md
 		Lesson_9.md = Lesson_9.md
+		Lesson_12.md = Lesson_12.md
 	EndProjectSection
 EndProject
 Global
