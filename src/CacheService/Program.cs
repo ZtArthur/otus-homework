@@ -1,10 +1,11 @@
 ﻿namespace CacheService;
 
-class Program
+internal class Program
 {
-    static async Task Main(string[] args)
+    private static async Task Main(string[] args)
     {
-        var tcpServer = new TcpServer("127.0.0.1", port: 8080);
+        using var store = new SimpleStore();
+        var tcpServer = new TcpServer("127.0.0.1", port: 8080, store);
 
         await tcpServer.StartAsync();
 

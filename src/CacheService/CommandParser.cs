@@ -86,18 +86,13 @@ public readonly ref struct CommandParseResult
             Value = ReadOnlySpan<byte>.Empty
         };
 
-    public string AsString()
+    public (string command, string key, byte[]? value) Decode()
     {
         var command = Command.IsEmpty ? string.Empty : Encoding.UTF8.GetString(Command);
-        var key = Encoding.UTF8.GetString(Key);
+        var key = Key.IsEmpty ? string.Empty : Encoding.UTF8.GetString(Key);
+        var value = Value.IsEmpty ? null : Value.ToArray();
 
-        if (Value.IsEmpty)
-        {
-            return $"{command} {key}";
-        }
-
-        var value = Encoding.UTF8.GetString(Value);
-        return $"{command} {key} {value}";
+        return (command, key, value);
     }
 
     public bool Equals(CommandParseResult other) =>
