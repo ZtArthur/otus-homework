@@ -1,4 +1,6 @@
-﻿namespace CacheService.Tests;
+﻿using CacheService.Storage;
+
+namespace CacheService.Tests;
 
 public class SimpleStoreReadWriterLockTests
 {

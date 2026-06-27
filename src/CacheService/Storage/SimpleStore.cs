@@ -1,4 +1,4 @@
-﻿namespace CacheService;
+﻿namespace CacheService.Storage;
 
 public sealed class SimpleStore : IDisposable
 {

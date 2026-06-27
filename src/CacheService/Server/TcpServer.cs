@@ -2,8 +2,10 @@
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
+using CacheService.Parser;
+using CacheService.Storage;
 
-namespace CacheService;
+namespace CacheService.Server;
 
 public class TcpServer
 {

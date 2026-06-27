@@ -1,4 +1,7 @@
-﻿namespace CacheService;
+﻿using CacheService.Server;
+using CacheService.Storage;
+
+namespace CacheService;
 
 internal class Program
 {
