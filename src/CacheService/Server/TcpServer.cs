@@ -34,12 +34,16 @@ public class TcpServer
         serverSocket.Bind(serverEndpoint);
         serverSocket.Listen();
 
+        Console.WriteLine("CacheService is ready to listen...");
+
         while (!cancellationToken.IsCancellationRequested)
         {
             var clientSocket = await serverSocket.AcceptAsync(cancellationToken);
 
             _ = Task.Run(() => ProcessClientAsync(clientSocket, cancellationToken), cancellationToken);
         }
+
+        Console.WriteLine("CacheService is stopped...");
     }
 
     private async Task ProcessClientAsync(Socket clientSocket, CancellationToken cancellationToken)
