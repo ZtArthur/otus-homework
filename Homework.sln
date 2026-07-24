@@ -10,7 +10,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{088AAA34-D
 		Lesson_6.md = Lesson_6.md
 		Lesson_9.md = Lesson_9.md
 		Lesson_12.md = Lesson_12.md
+		Lesson_15.md = Lesson_15.md
 	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CacheService.LoadTests", "benchmarks\CacheService.LoadTests\CacheService.LoadTests.csproj", "{89810FDB-92F4-494A-B27C-0FACBDEA800B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -26,6 +29,10 @@ Global
 		{2FCD2143-F050-4F0B-A0D9-68CF03340D8A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2FCD2143-F050-4F0B-A0D9-68CF03340D8A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2FCD2143-F050-4F0B-A0D9-68CF03340D8A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{89810FDB-92F4-494A-B27C-0FACBDEA800B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{89810FDB-92F4-494A-B27C-0FACBDEA800B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{89810FDB-92F4-494A-B27C-0FACBDEA800B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{89810FDB-92F4-494A-B27C-0FACBDEA800B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 	EndGlobalSection
