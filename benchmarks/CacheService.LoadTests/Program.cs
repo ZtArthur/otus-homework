@@ -1,4 +1,5 @@
 ﻿using System.Text;
+using System.Text.Json;
 using NBomber.CSharp;
 
 namespace CacheService.LoadTests;
@@ -18,12 +19,21 @@ internal class Program
                     using var client = new CacheServiceClient("127.0.0.1", port: 9000);
                     await client.ConnectAsync();
 
-                    var key = $"key_{random.Next(minValue: 1, maxValue: 100_000)}";
-                    var value = Encoding.UTF8.GetBytes($"value_{Guid.NewGuid()}");
+                    var id = random.Next(minValue: 1, maxValue: 100_000);
+                    var key = $"key_{id}";
+                    var createdAt = DateTime.Now;
+                    var profile = new UserProfile
+                    {
+                        Id = id,
+                        Username = "Marko Polo",
+                        CreatedAt = createdAt
+                    };
+
+                    var profileBytes = JsonSerializer.SerializeToUtf8Bytes(profile);
 
                     Console.WriteLine("Sending...");
 
-                    var responseBytes = await client.SetAsync(key, value);
+                    var responseBytes = await client.SetAsync(key, profileBytes);
                     var responseString = Encoding.UTF8.GetString(responseBytes, index: 0, responseBytes.Length);
 
                     Console.WriteLine("Response: {0}", responseString);
@@ -45,5 +55,14 @@ internal class Program
         NBomberRunner
             .RegisterScenarios(scenario)
             .Run();
+    }
+
+    public class UserProfile
+    {
+        public int Id { get; set; }
+
+        public string Username { get; set; }
+
+        public DateTime CreatedAt { get; set; }
     }
 }

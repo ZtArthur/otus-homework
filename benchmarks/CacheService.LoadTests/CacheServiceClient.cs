@@ -33,7 +33,7 @@ public class CacheServiceClient : IDisposable
     {
         ArgumentNullException.ThrowIfNull(_networkStream);
 
-        var command = $"SET {key} {Convert.ToBase64String(value)}";
+        var command = $"SET {key} {Encoding.UTF8.GetString(value)}";
 
         await WriteAsync(command);
 
