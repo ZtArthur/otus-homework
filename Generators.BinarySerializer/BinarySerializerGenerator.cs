@@ -12,7 +12,7 @@ namespace Generators.BinarySerializer
         {
             const string source =
                 @"
-                namespace GeneratorsBinarySerializer
+                namespace Generators.BinarySerializer
                 {
                     public static partial class HelloGenerator
                     {
@@ -23,7 +23,7 @@ namespace Generators.BinarySerializer
 
             const string attributeSource =
                 @"
-                namespace GeneratorsBinarySerializer
+                namespace Generators.BinarySerializer
                 {
                     [System.AttributeUsage(System.AttributeTargets.Class)]
                     public sealed class GenerateBinarySerializerAttribute : System.Attribute

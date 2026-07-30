@@ -1,4 +1,4 @@
-﻿using GeneratorsBinarySerializer;
+﻿using Generators.BinarySerializer;
 
 namespace CacheService.Models;
 
