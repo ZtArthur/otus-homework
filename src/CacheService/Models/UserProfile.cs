@@ -1,5 +1,8 @@
-﻿namespace CacheService.Models;
+﻿using GeneratorsBinarySerializer;
 
+namespace CacheService.Models;
+
+[GenerateBinarySerializer]
 public class UserProfile
 {
     public int Id { get; set; }
