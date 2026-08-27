@@ -3,7 +3,7 @@
 namespace CacheService.Models;
 
 [GenerateBinarySerializer]
-public class UserProfile
+public partial class UserProfile
 {
     public int Id { get; set; }
 
