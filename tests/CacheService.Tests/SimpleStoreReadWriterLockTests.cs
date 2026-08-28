@@ -36,7 +36,7 @@ public class SimpleStoreReadWriterLockTests
                         {
                             for (var i = 0; i < writeCount; i++)
                             {
-                                store.Set(key, [byte.MinValue]);
+                                store.Set(key, new());
                             }
                         }
                     );

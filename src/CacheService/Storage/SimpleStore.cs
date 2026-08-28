@@ -1,4 +1,7 @@
-﻿namespace CacheService.Storage;
+﻿using System.Text.Json;
+using CacheService.Models;
+
+namespace CacheService.Storage;
 
 public sealed class SimpleStore : IDisposable
 {
@@ -9,7 +12,7 @@ public sealed class SimpleStore : IDisposable
     private long _getCount;
     private long _deleteCount;
 
-    public void Set(string key, byte[] value)
+    public void Set(string key, UserProfile profile)
     {
         ArgumentException.ThrowIfNullOrEmpty(key);
 
@@ -17,7 +20,7 @@ public sealed class SimpleStore : IDisposable
         {
             _lock.EnterWriteLock();
 
-            _store[key] = value;
+            _store[key] = JsonSerializer.SerializeToUtf8Bytes(profile);
 
             Interlocked.Increment(ref _setCount);
         }
@@ -27,7 +30,7 @@ public sealed class SimpleStore : IDisposable
         }
     }
 
-    public byte[]? Get(string key)
+    public UserProfile? Get(string key)
     {
         ArgumentException.ThrowIfNullOrEmpty(key);
 
@@ -39,7 +42,9 @@ public sealed class SimpleStore : IDisposable
 
             Interlocked.Increment(ref _getCount);
 
-            return value;
+            return value is null
+                ? null
+                : JsonSerializer.Deserialize<UserProfile>(value);
         }
         finally
         {

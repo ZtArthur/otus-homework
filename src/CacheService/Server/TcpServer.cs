@@ -2,6 +2,8 @@
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
+using System.Text.Json;
+using CacheService.Models;
 using CacheService.Parser;
 using CacheService.Storage;
 
@@ -34,12 +36,16 @@ public class TcpServer
         serverSocket.Bind(serverEndpoint);
         serverSocket.Listen();
 
+        Console.WriteLine("CacheService is ready to listen...");
+
         while (!cancellationToken.IsCancellationRequested)
         {
             var clientSocket = await serverSocket.AcceptAsync(cancellationToken);
 
             _ = Task.Run(() => ProcessClientAsync(clientSocket, cancellationToken), cancellationToken);
         }
+
+        Console.WriteLine("CacheService is stopped...");
     }
 
     private async Task ProcessClientAsync(Socket clientSocket, CancellationToken cancellationToken)
@@ -68,27 +74,40 @@ public class TcpServer
                 switch (command)
                 {
                     case "SET":
-                        _store.Set(key, value!);
-                        await clientSocket.SendAsync(OkResponse);
+                        var profile = JsonSerializer.Deserialize<UserProfile>(result.Value);
+
+                        if (profile is null)
+                        {
+                            await clientSocket.SendAsync(ErrResponse);
+                        }
+                        else
+                        {
+                            _store.Set(key, profile);
+
+                            await clientSocket.SendAsync(OkResponse);
+                        }
 
                         break;
 
                     case "GET":
                         var storedValue = _store.Get(key);
 
-                        if (storedValue is { Length: > 0 })
+                        if (storedValue is null)
                         {
-                            await clientSocket.SendAsync(storedValue);
+                            await clientSocket.SendAsync(NilResponse);
                         }
                         else
                         {
-                            await clientSocket.SendAsync(NilResponse);
+                            var storedValueBytes = JsonSerializer.SerializeToUtf8Bytes(storedValue);
+
+                            await clientSocket.SendAsync(storedValueBytes);
                         }
 
                         break;
 
                     case "DELETE":
                         _store.Delete(key);
+
                         await clientSocket.SendAsync(OkResponse);
 
                         break;
