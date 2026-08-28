@@ -20,6 +20,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CacheService.LoadTests", "b
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Generators.BinarySerializer", "Generators.BinarySerializer\Generators.BinarySerializer.csproj", "{1E557C05-6F2C-48E0-AEC0-CA1537D33279}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CacheService.Benchmarks", "benchmarks\CacheService.Benchmarks\CacheService.Benchmarks.csproj", "{7B6DFEBE-9487-46CD-9FAC-260B873CCC3B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -42,6 +44,10 @@ Global
 		{1E557C05-6F2C-48E0-AEC0-CA1537D33279}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1E557C05-6F2C-48E0-AEC0-CA1537D33279}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1E557C05-6F2C-48E0-AEC0-CA1537D33279}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7B6DFEBE-9487-46CD-9FAC-260B873CCC3B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7B6DFEBE-9487-46CD-9FAC-260B873CCC3B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7B6DFEBE-9487-46CD-9FAC-260B873CCC3B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7B6DFEBE-9487-46CD-9FAC-260B873CCC3B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 	EndGlobalSection
