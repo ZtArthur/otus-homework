@@ -11,6 +11,8 @@ namespace CacheService.Server;
 
 public class TcpServer
 {
+    private const int MaximumMessageLength = 4_194_304;
+    
     private static readonly byte[] OkResponse = "OK\r\n"u8.ToArray();
     private static readonly byte[] NilResponse = "(nil)\r\n"u8.ToArray();
     private static readonly byte[] ErrResponse = "-ERR Unknown command\r\n"u8.ToArray();
@@ -59,9 +61,9 @@ public class TcpServer
             {
                 var length = await clientSocket.ReceiveAsync(array, cancellationToken);
 
-                if (length == 0)
+                if (length is 0 or > MaximumMessageLength)
                 {
-                    Console.WriteLine("Client disconnected");
+                    Console.WriteLine("Client disconnected or possible maximum length has reached");
 
                     break;
                 }
