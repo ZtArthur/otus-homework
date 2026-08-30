@@ -23,7 +23,7 @@ public class TcpServer
     private readonly int _port;
     private readonly SimpleStore _store;
 
-    private readonly SemaphoreSlim _activeConnections;
+    private readonly SemaphoreSlim _concurrentConnections;
 
     public TcpServer(string host, int port, SimpleStore store)
     {
@@ -34,7 +34,7 @@ public class TcpServer
         _port = port;
         _store = store;
 
-        _activeConnections = new SemaphoreSlim(initialCount: MaxConcurrentConnections);
+        _concurrentConnections = new SemaphoreSlim(initialCount: MaxConcurrentConnections);
     }
 
     public async Task StartAsync(CancellationToken cancellationToken = default)
@@ -53,7 +53,7 @@ public class TcpServer
 
             try
             {
-                await _activeConnections.WaitAsync(cancellationToken);
+                await _concurrentConnections.WaitAsync(cancellationToken);
             }
             catch (OperationCanceledException)
             {
@@ -94,7 +94,7 @@ public class TcpServer
                 var memory = new ReadOnlyMemory<byte>(array, start: 0, length);
                 var result = CommandParser.Parse(memory.Span);
 
-                var (command, key, value) = result.Decode();
+                var (command, key, _) = result.Decode();
 
                 switch (command)
                 {
@@ -184,7 +184,7 @@ public class TcpServer
         }
         finally
         {
-            _activeConnections.Release();
+            _concurrentConnections.Release();
 
             arrayPool.Return(array);
 
