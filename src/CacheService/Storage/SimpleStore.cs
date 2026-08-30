@@ -20,7 +20,11 @@ public sealed class SimpleStore : IDisposable
         {
             _lock.EnterWriteLock();
 
-            _store[key] = JsonSerializer.SerializeToUtf8Bytes(profile);
+            using var ms = new MemoryStream();
+            
+            profile.SerializeToBinary(ms);
+            
+            _store[key] = ms.ToArray();
 
             Interlocked.Increment(ref _setCount);
         }
