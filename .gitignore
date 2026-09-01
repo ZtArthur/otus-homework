@@ -360,3 +360,8 @@ MigrationBackup/
 
 # CodeScoring
 .codescoring/
+
+# Source generator output (EmitCompilerGeneratedFiles) and local NuGet config
+**/Generated/
+
+NuGet.Config

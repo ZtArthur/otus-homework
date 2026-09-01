@@ -1,9 +1,11 @@
 ﻿using System.Buffers;
+using System.Diagnostics;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Text.Json;
 using CacheService.Models;
+using CacheService.Observability;
 using CacheService.Parser;
 using CacheService.Storage;
 
@@ -11,12 +13,17 @@ namespace CacheService.Server;
 
 public class TcpServer
 {
+    private const int MaximumMessageLength = 4_096; // 4 KB
+    private const int MaxConcurrentConnections = 5;
+
     private static readonly byte[] OkResponse = "OK\r\n"u8.ToArray();
     private static readonly byte[] NilResponse = "(nil)\r\n"u8.ToArray();
     private static readonly byte[] ErrResponse = "-ERR Unknown command\r\n"u8.ToArray();
     private readonly string _host;
     private readonly int _port;
     private readonly SimpleStore _store;
+
+    private readonly SemaphoreSlim _concurrentConnections;
 
     public TcpServer(string host, int port, SimpleStore store)
     {
@@ -26,6 +33,8 @@ public class TcpServer
         _host = host;
         _port = port;
         _store = store;
+
+        _concurrentConnections = new SemaphoreSlim(initialCount: MaxConcurrentConnections);
     }
 
     public async Task StartAsync(CancellationToken cancellationToken = default)
@@ -42,6 +51,15 @@ public class TcpServer
         {
             var clientSocket = await serverSocket.AcceptAsync(cancellationToken);
 
+            try
+            {
+                await _concurrentConnections.WaitAsync(cancellationToken);
+            }
+            catch (OperationCanceledException)
+            {
+                CloseSocket(clientSocket);
+            }
+
             _ = Task.Run(() => ProcessClientAsync(clientSocket, cancellationToken), cancellationToken);
         }
 
@@ -52,7 +70,7 @@ public class TcpServer
     {
         var arrayPool = ArrayPool<byte>.Shared;
 
-        var array = arrayPool.Rent(minimumLength: 1024);
+        var array = arrayPool.Rent(minimumLength: MaximumMessageLength + 1);
         try
         {
             while (!cancellationToken.IsCancellationRequested)
@@ -66,56 +84,96 @@ public class TcpServer
                     break;
                 }
 
+                if (length > MaximumMessageLength)
+                {
+                    Console.WriteLine("Client has reached limit bytes, dropping connection");
+
+                    break;
+                }
+
                 var memory = new ReadOnlyMemory<byte>(array, start: 0, length);
                 var result = CommandParser.Parse(memory.Span);
 
-                var (command, key, value) = result.Decode();
+                var (command, key, _) = result.Decode();
 
                 switch (command)
                 {
                     case "SET":
-                        var profile = JsonSerializer.Deserialize<UserProfile>(result.Value);
-
-                        if (profile is null)
+                        using (var activity = AppTelemetry.ActivitySource.StartActivity())
                         {
-                            await clientSocket.SendAsync(ErrResponse);
-                        }
-                        else
-                        {
-                            _store.Set(key, profile);
+                            activity?.SetTag(AppTelemetry.TagCommandType, "SET");
+                            activity?.SetTag(AppTelemetry.TagCommandLength, length);
 
-                            await clientSocket.SendAsync(OkResponse);
-                        }
+                            var stopwatch = Stopwatch.StartNew();
 
-                        break;
+                            var profile = JsonSerializer.Deserialize<UserProfile>(result.Value);
+
+                            if (profile is null)
+                            {
+                                await clientSocket.SendAsync(ErrResponse);
+                            }
+                            else
+                            {
+                                _store.Set(key, profile);
+
+                                await clientSocket.SendAsync(OkResponse);
+                            }
+
+                            AppTelemetry.AddCommandProcessed("SET");
+                            AppTelemetry.AddCommandExecutionTime("SET", stopwatch.Elapsed.TotalSeconds);
+
+                            break;
+                        }
 
                     case "GET":
-                        var storedValue = _store.Get(key);
-
-                        if (storedValue is null)
+                        using (var activity = AppTelemetry.ActivitySource.StartActivity())
                         {
-                            await clientSocket.SendAsync(NilResponse);
-                        }
-                        else
-                        {
-                            var storedValueBytes = JsonSerializer.SerializeToUtf8Bytes(storedValue);
+                            activity?.SetTag(AppTelemetry.TagCommandType, "GET");
+                            activity?.SetTag(AppTelemetry.TagCommandLength, length);
 
-                            await clientSocket.SendAsync(storedValueBytes);
+                            var stopwatch = Stopwatch.StartNew();
+
+                            var storedValue = _store.Get(key);
+
+                            if (storedValue is null)
+                            {
+                                await clientSocket.SendAsync(NilResponse);
+                            }
+                            else
+                            {
+                                var storedValueBytes = JsonSerializer.SerializeToUtf8Bytes(storedValue);
+
+                                await clientSocket.SendAsync(storedValueBytes);
+                            }
+
+                            AppTelemetry.AddCommandProcessed("GET");
+                            AppTelemetry.AddCommandExecutionTime("GET", stopwatch.Elapsed.TotalSeconds);
                         }
 
                         break;
 
                     case "DELETE":
-                        _store.Delete(key);
+                        using (var activity = AppTelemetry.ActivitySource.StartActivity())
+                        {
+                            activity?.SetTag(AppTelemetry.TagCommandType, "DELETE");
+                            activity?.SetTag(AppTelemetry.TagCommandLength, length);
 
-                        await clientSocket.SendAsync(OkResponse);
+                            var stopwatch = Stopwatch.StartNew();
+
+                            _store.Delete(key);
+
+                            await clientSocket.SendAsync(OkResponse);
+
+                            AppTelemetry.AddCommandProcessed("DELETE");
+                            AppTelemetry.AddCommandExecutionTime("DELETE", stopwatch.Elapsed.TotalSeconds);
+                        }
 
                         break;
 
                     default: await clientSocket.SendAsync(ErrResponse); break;
                 }
 
-                Console.WriteLine("Received a command: {0} {1} {2}", command, key, value);
+                Console.WriteLine("Received a command: {0} {1}", command, key);
             }
         }
         catch (Exception e)
@@ -126,6 +184,8 @@ public class TcpServer
         }
         finally
         {
+            _concurrentConnections.Release();
+
             arrayPool.Return(array);
 
             CloseSocket(clientSocket);

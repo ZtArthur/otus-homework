@@ -14,6 +14,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{088AAA34-D
 		Lesson_15_load_test.md = Lesson_15_load_test.md
 		Lesson_18.md = Lesson_18.md
 		Lesson_21.md = Lesson_21.md
+		Lesson_24.md = Lesson_24.md
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CacheService.LoadTests", "benchmarks\CacheService.LoadTests\CacheService.LoadTests.csproj", "{89810FDB-92F4-494A-B27C-0FACBDEA800B}"
