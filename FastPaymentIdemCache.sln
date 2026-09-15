@@ -1,8 +1,8 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CacheService", "src\CacheService\CacheService.csproj", "{FCAE26F4-8D1A-4480-9723-AFFE2465A3E6}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FastPaymentIdemCache", "src\FastPaymentIdemCache\FastPaymentIdemCache.csproj", "{FCAE26F4-8D1A-4480-9723-AFFE2465A3E6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CacheService.Tests", "tests\CacheService.Tests\CacheService.Tests.csproj", "{2FCD2143-F050-4F0B-A0D9-68CF03340D8A}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FastPaymentIdemCache.Tests", "tests\FastPaymentIdemCache.Tests\FastPaymentIdemCache.Tests.csproj", "{2FCD2143-F050-4F0B-A0D9-68CF03340D8A}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{088AAA34-DE0D-4E5F-B864-4FC7F85FCAE4}"
 	ProjectSection(SolutionItems) = preProject
@@ -19,11 +19,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{088AAA34-D
 		Lesson_27_report.md = Lesson_27_report.md
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CacheService.LoadTests", "benchmarks\CacheService.LoadTests\CacheService.LoadTests.csproj", "{89810FDB-92F4-494A-B27C-0FACBDEA800B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FastPaymentIdemCache.LoadTests", "benchmarks\FastPaymentIdemCache.LoadTests\FastPaymentIdemCache.LoadTests.csproj", "{89810FDB-92F4-494A-B27C-0FACBDEA800B}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Generators.BinarySerializer", "Generators.BinarySerializer\Generators.BinarySerializer.csproj", "{1E557C05-6F2C-48E0-AEC0-CA1537D33279}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CacheService.Benchmarks", "benchmarks\CacheService.Benchmarks\CacheService.Benchmarks.csproj", "{7B6DFEBE-9487-46CD-9FAC-260B873CCC3B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FastPaymentIdemCache.Benchmarks", "benchmarks\FastPaymentIdemCache.Benchmarks\FastPaymentIdemCache.Benchmarks.csproj", "{7B6DFEBE-9487-46CD-9FAC-260B873CCC3B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

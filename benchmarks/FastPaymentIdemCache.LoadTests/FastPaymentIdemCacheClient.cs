@@ -1,9 +1,9 @@
 ﻿using System.Net.Sockets;
 using System.Text;
 
-namespace CacheService.LoadTests;
+namespace FastPaymentIdemCache.LoadTests;
 
-public class CacheServiceClient : IDisposable
+public class FastPaymentIdemCacheClient : IDisposable
 {
     private readonly string _host;
     private readonly int _port;
@@ -11,7 +11,7 @@ public class CacheServiceClient : IDisposable
     private TcpClient? _client;
     private NetworkStream? _networkStream;
 
-    public CacheServiceClient(string host, int port)
+    public FastPaymentIdemCacheClient(string host, int port)
     {
         _host = host;
         _port = port;

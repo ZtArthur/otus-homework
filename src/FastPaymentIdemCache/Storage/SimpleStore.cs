@@ -1,7 +1,7 @@
 ﻿using System.Text.Json;
-using CacheService.Models;
+using FastPaymentIdemCache.Models;
 
-namespace CacheService.Storage;
+namespace FastPaymentIdemCache.Storage;
 
 public sealed class SimpleStore : IDisposable
 {

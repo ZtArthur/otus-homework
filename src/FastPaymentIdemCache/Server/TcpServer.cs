@@ -4,12 +4,12 @@ using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Text.Json;
-using CacheService.Models;
-using CacheService.Observability;
-using CacheService.Parser;
-using CacheService.Storage;
+using FastPaymentIdemCache.Models;
+using FastPaymentIdemCache.Observability;
+using FastPaymentIdemCache.Parser;
+using FastPaymentIdemCache.Storage;
 
-namespace CacheService.Server;
+namespace FastPaymentIdemCache.Server;
 
 public class TcpServer
 {
@@ -45,7 +45,7 @@ public class TcpServer
         serverSocket.Bind(serverEndpoint);
         serverSocket.Listen();
 
-        Console.WriteLine("CacheService is ready to listen...");
+        Console.WriteLine("FastPaymentIdemCache is ready to listen...");
 
         while (!cancellationToken.IsCancellationRequested)
         {
@@ -63,7 +63,7 @@ public class TcpServer
             _ = Task.Run(() => ProcessClientAsync(clientSocket, cancellationToken), cancellationToken);
         }
 
-        Console.WriteLine("CacheService is stopped...");
+        Console.WriteLine("FastPaymentIdemCache is stopped...");
     }
 
     private async Task ProcessClientAsync(Socket clientSocket, CancellationToken cancellationToken)

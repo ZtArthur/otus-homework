@@ -1,12 +1,12 @@
-﻿using CacheService.Observability;
-using CacheService.Server;
-using CacheService.Storage;
+﻿using FastPaymentIdemCache.Observability;
+using FastPaymentIdemCache.Server;
+using FastPaymentIdemCache.Storage;
 using OpenTelemetry;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
 
-namespace CacheService;
+namespace FastPaymentIdemCache;
 
 public class Program
 {
@@ -24,7 +24,7 @@ public class Program
             .AddConsoleExporter()
             .Build();
 
-        Console.WriteLine("Starting CacheService...");
+        Console.WriteLine("Starting FastPaymentIdemCache server...");
 
         using var store = new SimpleStore();
 
@@ -32,7 +32,7 @@ public class Program
 
         await tcpServer.StartAsync();
 
-        Console.WriteLine("Press any key to close...");
+        Console.WriteLine("Press any key to stop server...");
 
         Console.ReadLine();
     }

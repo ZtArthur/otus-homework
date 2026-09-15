@@ -1,12 +1,12 @@
 ﻿using System.Text.Json;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Running;
-using CacheService.Benchmarks;
-using CacheService.Models;
+using FastPaymentIdemCache.Benchmarks;
+using FastPaymentIdemCache.Models;
 
 BenchmarkRunner.Run<SerializationBenchmarks>();
 
-namespace CacheService.Benchmarks
+namespace FastPaymentIdemCache.Benchmarks
 {
     [MemoryDiagnoser]
     public class SerializationBenchmarks

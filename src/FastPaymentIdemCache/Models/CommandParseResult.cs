@@ -1,6 +1,6 @@
 ﻿using System.Text;
 
-namespace CacheService.Models;
+namespace FastPaymentIdemCache.Models;
 
 public readonly ref struct CommandParseResult
 {

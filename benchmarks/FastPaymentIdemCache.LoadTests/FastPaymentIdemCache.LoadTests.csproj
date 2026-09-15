@@ -6,14 +6,11 @@
         <LangVersion>latest</LangVersion>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
+        <RootNamespace>FastPaymentIdemCache.LoadTests</RootNamespace>
     </PropertyGroup>
 
     <ItemGroup>
-      <PackageReference Include="BenchmarkDotNet" Version="0.15.7" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <ProjectReference Include="..\..\src\CacheService\CacheService.csproj" />
+      <PackageReference Include="NBomber" Version="6.5.0" />
     </ItemGroup>
 
 </Project>

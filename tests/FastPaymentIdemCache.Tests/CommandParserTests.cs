@@ -1,8 +1,8 @@
 ﻿using System.Text;
-using CacheService.Models;
-using CacheService.Parser;
+using FastPaymentIdemCache.Models;
+using FastPaymentIdemCache.Parser;
 
-namespace CacheService.Tests;
+namespace FastPaymentIdemCache.Tests;
 
 public class CommandParserTests
 {
