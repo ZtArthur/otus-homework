@@ -1,6 +1,6 @@
-﻿using CacheService.Models;
+﻿using FastPaymentIdemCache.Models;
 
-namespace CacheService.Parser;
+namespace FastPaymentIdemCache.Parser;
 
 public static class CommandParser
 {

@@ -1,11 +1,11 @@
 ﻿using System.Diagnostics;
 using System.Diagnostics.Metrics;
 
-namespace CacheService.Observability;
+namespace FastPaymentIdemCache.Observability;
 
 public static class AppTelemetry
 {
-    public const string ServiceName = "CacheService";
+    public const string ServiceName = "FastPaymentIdemCache";
     public const string ServiceVersion = "1.0.0";
 
     public const string TagCommandType = "app.command.type";

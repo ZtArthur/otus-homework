@@ -1,6 +1,6 @@
-﻿using CacheService.Storage;
+﻿using FastPaymentIdemCache.Storage;
 
-namespace CacheService.Tests;
+namespace FastPaymentIdemCache.Tests;
 
 public class SimpleStoreReadWriterLockTests
 {

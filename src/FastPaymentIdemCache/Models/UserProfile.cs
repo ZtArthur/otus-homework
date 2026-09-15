@@ -1,6 +1,6 @@
 ﻿using Generators.BinarySerializer;
 
-namespace CacheService.Models;
+namespace FastPaymentIdemCache.Models;
 
 [GenerateBinarySerializer]
 public partial class UserProfile

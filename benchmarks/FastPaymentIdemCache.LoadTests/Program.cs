@@ -2,7 +2,7 @@
 using System.Text.Json;
 using NBomber.CSharp;
 
-namespace CacheService.LoadTests;
+namespace FastPaymentIdemCache.LoadTests;
 
 internal class Program
 {
@@ -16,7 +16,7 @@ internal class Program
                 name: "cache_service_load_scenario",
                 run: async _ =>
                 {
-                    using var client = new CacheServiceClient("127.0.0.1", port: 9000);
+                    using var client = new FastPaymentIdemCacheClient("127.0.0.1", port: 9000);
                     await client.ConnectAsync();
 
                     var id = random.Next(minValue: 1, maxValue: 100_000);
