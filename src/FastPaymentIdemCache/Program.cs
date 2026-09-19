@@ -12,21 +12,31 @@ public class Program
 {
     private static async Task Main(string[] _)
     {
-        Sdk.CreateTracerProviderBuilder()
+        using var traceProvider = Sdk.CreateTracerProviderBuilder()
             .ConfigureResource(r => r.AddService(AppTelemetry.ServiceName, AppTelemetry.ServiceVersion))
             .AddSource(AppTelemetry.ServiceName)
-            .AddConsoleExporter()
+            .AddOtlpExporter()
             .Build();
 
-        Sdk.CreateMeterProviderBuilder()
+        using var meterProvider = Sdk.CreateMeterProviderBuilder()
             .ConfigureResource(r => r.AddService(AppTelemetry.ServiceName, AppTelemetry.ServiceVersion))
             .AddMeter(AppTelemetry.ServiceName)
-            .AddConsoleExporter()
+            .AddRuntimeInstrumentation()
+            .AddView(
+                AppTelemetry.CommandExecutionTimeInstrumentName,
+                new ExplicitBucketHistogramConfiguration
+                {
+                    Boundaries = [0.0005, 0.001, 0.002, 0.005, 0.01, 0.025, 0.05, 0.1, 0.25, 0.5, 1, 2.5, 5]
+                }
+            )
+            .AddOtlpExporter()
             .Build();
 
         Console.WriteLine("Starting FastPaymentIdemCache server...");
 
         using var store = new SimpleStore();
+
+        AppTelemetry.SetStoreEntryCountProvider(() => store.Count);
 
         var tcpServer = new TcpServer("127.0.0.1", port: 9000, store);
 

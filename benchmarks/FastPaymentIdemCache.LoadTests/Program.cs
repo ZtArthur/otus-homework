@@ -6,7 +6,7 @@ namespace FastPaymentIdemCache.LoadTests;
 
 internal class Program
 {
-    private static async Task Main(string[] args)
+    private static Task Main()
     {
         Console.WriteLine("Starting...");
 
@@ -43,18 +43,20 @@ internal class Program
                         : Response.Fail();
                 }
             )
-            .WithWarmUpDuration(TimeSpan.FromSeconds(seconds: 7))
+            .WithWarmUpDuration(TimeSpan.FromSeconds(seconds: 2))
             .WithLoadSimulations(
                 Simulation.Inject(
                     rate: 100,
                     interval: TimeSpan.FromSeconds(seconds: 1),
-                    during: TimeSpan.FromSeconds(seconds: 30)
+                    during: TimeSpan.FromSeconds(seconds: 5)
                 )
             );
 
         NBomberRunner
             .RegisterScenarios(scenario)
             .Run();
+
+        return Task.CompletedTask;
     }
 
     public class UserProfile

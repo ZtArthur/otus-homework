@@ -51,6 +51,8 @@ public class TcpServer
         {
             var clientSocket = await serverSocket.AcceptAsync(cancellationToken);
 
+            AppTelemetry.OnConnectionAccepted();
+
             try
             {
                 await _concurrentConnections.WaitAsync(cancellationToken);
@@ -68,6 +70,8 @@ public class TcpServer
 
     private async Task ProcessClientAsync(Socket clientSocket, CancellationToken cancellationToken)
     {
+        AppTelemetry.OnClientConnected();
+
         var arrayPool = ArrayPool<byte>.Shared;
 
         var array = arrayPool.Rent(minimumLength: MaximumMessageLength + 1);
@@ -88,8 +92,12 @@ public class TcpServer
                 {
                     Console.WriteLine("Client has reached limit bytes, dropping connection");
 
+                    AppTelemetry.AddProtocolError(AppTelemetry.ErrorReasonInvalidPayload);
+
                     break;
                 }
+
+                AppTelemetry.AddBytesReceived(length);
 
                 var memory = new ReadOnlyMemory<byte>(array, start: 0, length);
                 var result = CommandParser.Parse(memory.Span);
@@ -101,8 +109,8 @@ public class TcpServer
                     case "SET":
                         using (var activity = AppTelemetry.ActivitySource.StartActivity())
                         {
-                            activity?.SetTag(AppTelemetry.TagCommandType, "SET");
-                            activity?.SetTag(AppTelemetry.TagCommandLength, length);
+                            activity?.SetTag(AppTelemetry.CommandTypeTagName, "SET");
+                            activity?.SetTag(AppTelemetry.CommandLengthTagName, length);
 
                             var stopwatch = Stopwatch.StartNew();
 
@@ -110,15 +118,19 @@ public class TcpServer
 
                             if (profile is null)
                             {
-                                await clientSocket.SendAsync(ErrResponse);
+                                await SendResponseAsync(clientSocket, ErrResponse);
+
+                                AppTelemetry.AddProtocolError(AppTelemetry.ErrorReasonInvalidPayload);
                             }
                             else
                             {
                                 _store.Set(key, profile);
 
-                                await clientSocket.SendAsync(OkResponse);
+                                await SendResponseAsync(clientSocket, OkResponse);
                             }
 
+                            stopwatch.Stop();
+                            
                             AppTelemetry.AddCommandProcessed("SET");
                             AppTelemetry.AddCommandExecutionTime("SET", stopwatch.Elapsed.TotalSeconds);
 
@@ -128,8 +140,8 @@ public class TcpServer
                     case "GET":
                         using (var activity = AppTelemetry.ActivitySource.StartActivity())
                         {
-                            activity?.SetTag(AppTelemetry.TagCommandType, "GET");
-                            activity?.SetTag(AppTelemetry.TagCommandLength, length);
+                            activity?.SetTag(AppTelemetry.CommandTypeTagName, "GET");
+                            activity?.SetTag(AppTelemetry.CommandLengthTagName, length);
 
                             var stopwatch = Stopwatch.StartNew();
 
@@ -137,14 +149,16 @@ public class TcpServer
 
                             if (storedValue is null)
                             {
-                                await clientSocket.SendAsync(NilResponse);
+                                await SendResponseAsync(clientSocket, NilResponse);
                             }
                             else
                             {
                                 var storedValueBytes = JsonSerializer.SerializeToUtf8Bytes(storedValue);
 
-                                await clientSocket.SendAsync(storedValueBytes);
+                                await SendResponseAsync(clientSocket, storedValueBytes);
                             }
+
+                            stopwatch.Stop();
 
                             AppTelemetry.AddCommandProcessed("GET");
                             AppTelemetry.AddCommandExecutionTime("GET", stopwatch.Elapsed.TotalSeconds);
@@ -155,14 +169,16 @@ public class TcpServer
                     case "DELETE":
                         using (var activity = AppTelemetry.ActivitySource.StartActivity())
                         {
-                            activity?.SetTag(AppTelemetry.TagCommandType, "DELETE");
-                            activity?.SetTag(AppTelemetry.TagCommandLength, length);
+                            activity?.SetTag(AppTelemetry.CommandTypeTagName, "DELETE");
+                            activity?.SetTag(AppTelemetry.CommandLengthTagName, length);
 
                             var stopwatch = Stopwatch.StartNew();
 
                             _store.Delete(key);
 
-                            await clientSocket.SendAsync(OkResponse);
+                            await SendResponseAsync(clientSocket, OkResponse);
+
+                            stopwatch.Stop();
 
                             AppTelemetry.AddCommandProcessed("DELETE");
                             AppTelemetry.AddCommandExecutionTime("DELETE", stopwatch.Elapsed.TotalSeconds);
@@ -170,7 +186,25 @@ public class TcpServer
 
                         break;
 
-                    default: await clientSocket.SendAsync(ErrResponse); break;
+                    default:
+                        using (var activity = AppTelemetry.ActivitySource.StartActivity())
+                        {
+                            activity?.SetTag(AppTelemetry.CommandTypeTagName, "ERROR");
+                            activity?.SetTag(AppTelemetry.CommandLengthTagName, length);
+                            
+                            var stopwatch = Stopwatch.StartNew();
+
+                            AppTelemetry.AddProtocolError(AppTelemetry.ErrorReasonUnknownCommand);
+
+                            await SendResponseAsync(clientSocket, ErrResponse);
+
+                            stopwatch.Stop();
+                            
+                            AppTelemetry.AddCommandProcessed("ERROR");
+                            AppTelemetry.AddCommandExecutionTime("ERROR", stopwatch.Elapsed.TotalSeconds);
+                        }
+
+                        break;
                 }
 
                 Console.WriteLine("Received a command: {0} {1}", command, key);
@@ -180,16 +214,27 @@ public class TcpServer
         {
             Console.WriteLine(e);
 
-            await clientSocket.SendAsync(Encoding.UTF8.GetBytes($"{e.Message}\r\n"));
+            AppTelemetry.AddProtocolError(AppTelemetry.ErrorReasonException);
+
+            await SendResponseAsync(clientSocket, Encoding.UTF8.GetBytes($"{e.Message}\r\n"));
         }
         finally
         {
+            AppTelemetry.OnClientDisconnected();
+
             _concurrentConnections.Release();
 
             arrayPool.Return(array);
 
             CloseSocket(clientSocket);
         }
+    }
+
+    private static async Task SendResponseAsync(Socket socket, byte[] payload)
+    {
+        await socket.SendAsync(payload);
+
+        AppTelemetry.AddBytesSent(payload.Length);
     }
 
     private static void CloseSocket(Socket clientSocket)

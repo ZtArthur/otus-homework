@@ -74,6 +74,23 @@ public sealed class SimpleStore : IDisposable
         }
     }
 
+    public int Count
+    {
+        get
+        {
+            _lock.EnterReadLock();
+
+            try
+            {
+                return _store.Count;
+            }
+            finally
+            {
+                _lock.ExitReadLock();
+            }
+        }
+    }
+
     public (long setCount, long getCount, long deleteCount) GetStatistics() => (_setCount, _getCount, _deleteCount);
 
     /// <inheritdoc />
