@@ -21,19 +21,18 @@ internal class Program
 
                     var id = random.Next(minValue: 1, maxValue: 100_000);
                     var key = $"key_{id}";
-                    var createdAt = DateTime.Now;
-                    var profile = new UserProfile
+                    var operation = new UserPaymentOperation
                     {
-                        Id = id,
-                        Username = "Marko Polo",
-                        CreatedAt = createdAt
+                        TransactionId = Guid.NewGuid(),
+                        TransactionDate = DateTime.Now,
+                        UserId = id
                     };
 
-                    var profileBytes = JsonSerializer.SerializeToUtf8Bytes(profile);
+                    var operationBytes = JsonSerializer.SerializeToUtf8Bytes(operation);
 
                     Console.WriteLine("Sending...");
 
-                    var responseBytes = await client.SetAsync(key, profileBytes);
+                    var responseBytes = await client.SetAsync(key, operationBytes);
                     var responseString = Encoding.UTF8.GetString(responseBytes, index: 0, responseBytes.Length);
 
                     Console.WriteLine("Response: {0}", responseString);
@@ -59,12 +58,12 @@ internal class Program
         return Task.CompletedTask;
     }
 
-    public class UserProfile
+    public class UserPaymentOperation
     {
-        public int Id { get; set; }
+        public Guid TransactionId { get; set; }
 
-        public string Username { get; set; }
+        public DateTime TransactionDate { get; set; }
 
-        public DateTime CreatedAt { get; set; }
+        public long UserId { get; set; }
     }
 }

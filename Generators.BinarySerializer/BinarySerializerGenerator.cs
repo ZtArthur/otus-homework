@@ -116,6 +116,11 @@ namespace Generators.BinarySerializer
 
         private static string GetWriteByType(IPropertySymbol property)
         {
+            if (property.Type.TypeKind == TypeKind.Enum)
+            {
+                return $"bw.Write((int){property.Name});";
+            }
+
             return property.Type.SpecialType switch
             {
                 SpecialType.System_Boolean or
@@ -129,11 +134,15 @@ namespace Generators.BinarySerializer
                     SpecialType.System_UInt64 or
                     SpecialType.System_Single or
                     SpecialType.System_Double or
+                    SpecialType.System_Decimal or
                     SpecialType.System_Char or
                     SpecialType.System_String => $"bw.Write({property.Name});",
-                _ => property.Type.ToDisplayString() == "System.DateTime"
-                    ? $"bw.Write({property.Name}.ToBinary());"
-                    : null
+                _ => property.Type.ToDisplayString() switch
+                {
+                    "System.DateTime" => $"bw.Write({property.Name}.ToBinary());",
+                    "System.Guid" => $"bw.Write({property.Name}.ToByteArray());",
+                    _ => null
+                }
             };
         }
     }

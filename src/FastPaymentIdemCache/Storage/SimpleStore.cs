@@ -12,7 +12,7 @@ public sealed class SimpleStore : IDisposable
     private long _getCount;
     private long _deleteCount;
 
-    public void Set(string key, UserProfile profile)
+    public void Set(string key, UserPaymentOperation operation)
     {
         ArgumentException.ThrowIfNullOrEmpty(key);
 
@@ -21,8 +21,8 @@ public sealed class SimpleStore : IDisposable
             _lock.EnterWriteLock();
 
             using var ms = new MemoryStream();
-            
-            profile.SerializeToBinary(ms);
+
+            operation.SerializeToBinary(ms);
             
             _store[key] = ms.ToArray();
 
@@ -34,7 +34,7 @@ public sealed class SimpleStore : IDisposable
         }
     }
 
-    public UserProfile? Get(string key)
+    public UserPaymentOperation? Get(string key)
     {
         ArgumentException.ThrowIfNullOrEmpty(key);
 
@@ -48,7 +48,7 @@ public sealed class SimpleStore : IDisposable
 
             return value is null
                 ? null
-                : JsonSerializer.Deserialize<UserProfile>(value);
+                : JsonSerializer.Deserialize<UserPaymentOperation>(value);
         }
         finally
         {

@@ -114,9 +114,9 @@ public class TcpServer
 
                             var stopwatch = Stopwatch.StartNew();
 
-                            var profile = JsonSerializer.Deserialize<UserProfile>(result.Value);
+                            var operation = JsonSerializer.Deserialize<UserPaymentOperation>(result.Value);
 
-                            if (profile is null)
+                            if (operation is null)
                             {
                                 await SendResponseAsync(clientSocket, ErrResponse);
 
@@ -124,7 +124,7 @@ public class TcpServer
                             }
                             else
                             {
-                                _store.Set(key, profile);
+                                _store.Set(key, operation);
 
                                 await SendResponseAsync(clientSocket, OkResponse);
                             }
