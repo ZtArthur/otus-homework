@@ -1,5 +1,4 @@
-﻿using System.Text.Json;
-using FastPaymentIdemCache.Models;
+﻿using FastPaymentIdemCache.Models;
 
 namespace FastPaymentIdemCache.Storage;
 
@@ -46,9 +45,20 @@ public sealed class SimpleStore : IDisposable
 
             Interlocked.Increment(ref _getCount);
 
-            return value is null
-                ? null
-                : JsonSerializer.Deserialize<UserPaymentOperation>(value);
+            if (value is null)
+            {
+                return null;
+            }
+
+            using var ms = new MemoryStream(value);
+            using var br = new BinaryReader(ms);
+
+            return new UserPaymentOperation
+            {
+                TransactionId = new Guid(br.ReadBytes(16)),
+                TransactionDate = DateTime.FromBinary(br.ReadInt64()),
+                UserId = br.ReadInt64()
+            };
         }
         finally
         {
