@@ -21,7 +21,6 @@
 
     <ItemGroup>
       <ProjectReference Include="..\..\src\FastPaymentIdemCache\FastPaymentIdemCache.csproj" />
-      <ProjectReference Include="..\FastPaymentIdemCache\FastPaymentIdemCache.csproj" />
     </ItemGroup>
 
 </Project>

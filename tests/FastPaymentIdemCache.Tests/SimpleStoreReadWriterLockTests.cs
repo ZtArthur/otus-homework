@@ -12,35 +12,39 @@ public class SimpleStoreReadWriterLockTests
         using var store = new SimpleStore();
         var expectedReadCount = readerTasksCount * readCount;
         var expectedWriteCount = writerTasksCount * writeCount;
-        var key = "item";
+        // Ключ читателей намеренно без значения: тест проверяет статистику блокировки
+        // и счётчиков под конкурентной нагрузкой, путь чтения (cache miss) на счётчики
+        // не влияет и от формата хранения значений не зависит.
+        var writeKey = "write_item";
+        var readKey = "read_item";
 
         var readerTasks = Enumerable.Range(start: 0, readerTasksCount)
             .Select(_ =>
-                {
-                    return Task.Run(() =>
+                    {
+                        return Task.Run(() =>
                         {
                             for (var i = 0; i < readCount; i++)
                             {
-                                store.Get(key);
+                                store.Get(readKey);
                             }
                         }
-                    );
-                }
+                        );
+                    }
             )
             .ToArray();
 
         var writerTasks = Enumerable.Range(start: 0, writerTasksCount)
             .Select(_ =>
-                {
-                    return Task.Run(() =>
+                    {
+                        return Task.Run(() =>
                         {
                             for (var i = 0; i < writeCount; i++)
                             {
-                                store.Set(key, new());
+                                store.Set(writeKey, new());
                             }
                         }
-                    );
-                }
+                        );
+                    }
             )
             .ToArray();
 

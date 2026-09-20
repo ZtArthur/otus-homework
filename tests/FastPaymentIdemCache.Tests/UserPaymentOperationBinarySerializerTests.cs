@@ -1,4 +1,5 @@
-﻿using FastPaymentIdemCache.Models;
+﻿using System.Text;
+using FastPaymentIdemCache.Models;
 
 namespace FastPaymentIdemCache.Tests;
 
@@ -18,13 +19,25 @@ public class UserPaymentOperationBinarySerializerTests
         operation.SerializeToBinary(ms);
         ms.Position = 0;
 
-        using var br = new BinaryReader(ms);
-        var transactionId = new Guid(br.ReadBytes(16));
-        var transactionDate = DateTime.FromBinary(br.ReadInt64());
-        var userId = br.ReadInt64();
+        var restored = DeserializeFromBinary(ms);
 
-        Assert.Equal(operation.TransactionId, transactionId);
-        Assert.Equal(operation.TransactionDate, transactionDate);
-        Assert.Equal(operation.UserId, userId);
+        Assert.Equal(operation.TransactionId, restored.TransactionId);
+        Assert.Equal(operation.TransactionDate, restored.TransactionDate);
+        Assert.Equal(operation.UserId, restored.UserId);
+    }
+
+    // Ручная десериализация живёт только в тестах: генератор эмитит лишь запись,
+    // продакшен GET отдаёт сохранённые байты как есть (десериализация — точка
+    // улучшения для замеров на этапе оптимизации).
+    private static UserPaymentOperation DeserializeFromBinary(Stream stream)
+    {
+        using var br = new BinaryReader(stream, Encoding.UTF8, leaveOpen: true);
+
+        return new UserPaymentOperation
+        {
+            TransactionId = new Guid(br.ReadBytes(16)),
+            TransactionDate = DateTime.FromBinary(br.ReadInt64()),
+            UserId = br.ReadInt64()
+        };
     }
 }
