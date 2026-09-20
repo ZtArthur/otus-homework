@@ -14,7 +14,7 @@ namespace FastPaymentIdemCache.Server;
 public class TcpServer
 {
     private const int MaximumMessageLength = 4_096; // 4 KB
-    private const int MaxConcurrentConnections = 5;
+    private const int MaxConcurrentConnections = 10;
 
     private static readonly byte[] OkResponse = "OK\r\n"u8.ToArray();
     private static readonly byte[] NilResponse = "(nil)\r\n"u8.ToArray();
