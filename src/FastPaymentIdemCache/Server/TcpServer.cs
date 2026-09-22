@@ -16,9 +16,9 @@ public class TcpServer
     private const int MaximumMessageLength = 4_096; // 4 KB
     private const int MaxConcurrentConnections = 10;
 
-    private static readonly byte[] OkResponse = "OK\r\n"u8.ToArray();
-    private static readonly byte[] NilResponse = "(nil)\r\n"u8.ToArray();
-    private static readonly byte[] ErrResponse = "-ERR Unknown command\r\n"u8.ToArray();
+    private static readonly byte[] OkResponse = [.. "OK\r\n"u8];
+    private static readonly byte[] NilResponse = [.. "(nil)\r\n"u8];
+    private static readonly byte[] ErrResponse = [.. "-ERR Unknown command\r\n"u8];
     private readonly string _host;
     private readonly int _port;
     private readonly SimpleStore _store;
@@ -106,13 +106,13 @@ public class TcpServer
 
                 switch (command)
                 {
-                    case "SET":
+                    case CommandType.SET:
                         using (var activity = AppTelemetry.ActivitySource.StartActivity())
                         {
-                            activity?.SetTag(AppTelemetry.CommandTypeTagName, "SET");
+                            activity?.SetTag(AppTelemetry.CommandTypeTagName, CommandType.SET);
                             activity?.SetTag(AppTelemetry.CommandLengthTagName, length);
 
-                            var stopwatch = Stopwatch.StartNew();
+                            var startTimestamp = Stopwatch.GetTimestamp();
 
                             var operation = JsonSerializer.Deserialize<UserPaymentOperation>(result.Value);
 
@@ -129,21 +129,19 @@ public class TcpServer
                                 await SendResponseAsync(clientSocket, OkResponse);
                             }
 
-                            stopwatch.Stop();
-                            
-                            AppTelemetry.AddCommandProcessed("SET");
-                            AppTelemetry.AddCommandExecutionTime("SET", stopwatch.Elapsed.TotalSeconds);
+                            AppTelemetry.AddCommandProcessed(CommandType.SET);
+                            AppTelemetry.AddCommandExecutionTime(CommandType.SET, Stopwatch.GetElapsedTime(startTimestamp).TotalSeconds);
 
                             break;
                         }
 
-                    case "GET":
+                    case CommandType.GET:
                         using (var activity = AppTelemetry.ActivitySource.StartActivity())
                         {
-                            activity?.SetTag(AppTelemetry.CommandTypeTagName, "GET");
+                            activity?.SetTag(AppTelemetry.CommandTypeTagName, CommandType.GET);
                             activity?.SetTag(AppTelemetry.CommandLengthTagName, length);
 
-                            var stopwatch = Stopwatch.StartNew();
+                            var startTimestamp = Stopwatch.GetTimestamp();
 
                             var storedValue = _store.Get(key);
 
@@ -158,30 +156,26 @@ public class TcpServer
                                 await SendResponseAsync(clientSocket, storedValueBytes);
                             }
 
-                            stopwatch.Stop();
-
-                            AppTelemetry.AddCommandProcessed("GET");
-                            AppTelemetry.AddCommandExecutionTime("GET", stopwatch.Elapsed.TotalSeconds);
+                            AppTelemetry.AddCommandProcessed(CommandType.GET);
+                            AppTelemetry.AddCommandExecutionTime(CommandType.GET, Stopwatch.GetElapsedTime(startTimestamp).TotalSeconds);
                         }
 
                         break;
 
-                    case "DELETE":
+                    case CommandType.DELETE:
                         using (var activity = AppTelemetry.ActivitySource.StartActivity())
                         {
-                            activity?.SetTag(AppTelemetry.CommandTypeTagName, "DELETE");
+                            activity?.SetTag(AppTelemetry.CommandTypeTagName, CommandType.DELETE);
                             activity?.SetTag(AppTelemetry.CommandLengthTagName, length);
 
-                            var stopwatch = Stopwatch.StartNew();
+                            var startTimestamp = Stopwatch.GetTimestamp();
 
                             _store.Delete(key);
 
                             await SendResponseAsync(clientSocket, OkResponse);
 
-                            stopwatch.Stop();
-
-                            AppTelemetry.AddCommandProcessed("DELETE");
-                            AppTelemetry.AddCommandExecutionTime("DELETE", stopwatch.Elapsed.TotalSeconds);
+                            AppTelemetry.AddCommandProcessed(CommandType.DELETE);
+                            AppTelemetry.AddCommandExecutionTime(CommandType.DELETE, Stopwatch.GetElapsedTime(startTimestamp).TotalSeconds);
                         }
 
                         break;
@@ -189,19 +183,20 @@ public class TcpServer
                     default:
                         using (var activity = AppTelemetry.ActivitySource.StartActivity())
                         {
-                            activity?.SetTag(AppTelemetry.CommandTypeTagName, "ERROR");
+                            activity?.SetTag(AppTelemetry.CommandTypeTagName, CommandType.UNKNOWN);
                             activity?.SetTag(AppTelemetry.CommandLengthTagName, length);
-                            
-                            var stopwatch = Stopwatch.StartNew();
+
+                            var startTimestamp = Stopwatch.GetTimestamp();
 
                             AppTelemetry.AddProtocolError(AppTelemetry.ErrorReasonUnknownCommand);
 
                             await SendResponseAsync(clientSocket, ErrResponse);
 
-                            stopwatch.Stop();
-                            
-                            AppTelemetry.AddCommandProcessed("ERROR");
-                            AppTelemetry.AddCommandExecutionTime("ERROR", stopwatch.Elapsed.TotalSeconds);
+                            AppTelemetry.AddCommandProcessed(CommandType.UNKNOWN);
+                            AppTelemetry.AddCommandExecutionTime(
+                                CommandType.UNKNOWN,
+                                Stopwatch.GetElapsedTime(startTimestamp).TotalSeconds
+                            );
                         }
 
                         break;

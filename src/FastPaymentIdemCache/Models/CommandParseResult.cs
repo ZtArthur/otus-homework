@@ -18,9 +18,17 @@ public readonly ref struct CommandParseResult
             Value = ReadOnlySpan<byte>.Empty
         };
 
-    public (string command, string key, byte[]? value) Decode()
+    public (CommandType command, string key, byte[]? value) Decode()
     {
-        var command = Command.IsEmpty ? string.Empty : Encoding.UTF8.GetString(Command);
+        var commandStr = Command.IsEmpty ? string.Empty : Encoding.UTF8.GetString(Command);
+        var command = commandStr switch
+        {
+            "SET" => CommandType.SET,
+            "GET" => CommandType.GET,
+            "DELETE" => CommandType.DELETE,
+            _ => CommandType.UNKNOWN
+        };
+
         var key = Key.IsEmpty ? string.Empty : Encoding.UTF8.GetString(Key);
         var value = Value.IsEmpty ? null : Value.ToArray();
 

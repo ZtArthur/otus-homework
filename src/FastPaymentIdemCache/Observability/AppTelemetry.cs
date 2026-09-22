@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics;
 using System.Diagnostics.Metrics;
+using FastPaymentIdemCache.Models;
 
 namespace FastPaymentIdemCache.Observability;
 
@@ -65,12 +66,12 @@ public static class AppTelemetry
             description: "Number of entries in the store.");
     }
 
-    public static void AddCommandProcessed(string commandType)
+    public static void AddCommandProcessed(CommandType commandType)
     {
         CommandsProcessed.Add(delta: 1, new KeyValuePair<string, object?>(CommandTypeTagName, commandType));
     }
 
-    public static void AddCommandExecutionTime(string commandType, double seconds)
+    public static void AddCommandExecutionTime(CommandType commandType, double seconds)
     {
         CommandExecutionTimeSeconds.Record(seconds, new KeyValuePair<string, object?>(CommandTypeTagName, commandType));
     }

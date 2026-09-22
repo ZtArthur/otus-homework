@@ -14,6 +14,7 @@ public class Program
     {
         using var traceProvider = Sdk.CreateTracerProviderBuilder()
             .ConfigureResource(r => r.AddService(AppTelemetry.ServiceName, AppTelemetry.ServiceVersion))
+            .SetSampler(new ParentBasedSampler(new TraceIdRatioBasedSampler(probability: 0.01)))
             .AddSource(AppTelemetry.ServiceName)
             .AddOtlpExporter()
             .Build();
