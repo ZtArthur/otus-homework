@@ -1,9 +1,39 @@
-﻿using FastPaymentIdemCache.Storage;
+﻿using FastPaymentIdemCache.Models;
+using FastPaymentIdemCache.Storage;
 
 namespace FastPaymentIdemCache.Tests;
 
 public class SimpleStoreReadWriterLockTests
 {
+    [Fact]
+    public void should_return_stored_operation_on_get_hit()
+    {
+        using var store = new SimpleStore();
+        var operation = new UserPaymentOperation
+        {
+            TransactionId = Guid.NewGuid(),
+            TransactionDate = DateTime.UtcNow,
+            UserId = 42_000
+        };
+
+        store.Set("user:1", operation);
+
+        var restored = store.Get("user:1");
+
+        Assert.NotNull(restored);
+        Assert.Equal(operation.TransactionId, restored.TransactionId);
+        Assert.Equal(operation.TransactionDate, restored.TransactionDate);
+        Assert.Equal(operation.UserId, restored.UserId);
+    }
+
+    [Fact]
+    public void should_return_null_on_get_miss()
+    {
+        using var store = new SimpleStore();
+
+        Assert.Null(store.Get("missing"));
+    }
+
     [Theory]
     [InlineData(5, 5, 50, 50)]
     [InlineData(25, 25, 150, 150)]

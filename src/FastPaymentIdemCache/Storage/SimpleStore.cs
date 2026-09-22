@@ -37,33 +37,29 @@ public sealed class SimpleStore : IDisposable
     {
         ArgumentException.ThrowIfNullOrEmpty(key);
 
+        byte[]? value;
+
         try
         {
             _lock.EnterReadLock();
 
-            var value = _store.GetValueOrDefault(key);
+            value = _store.GetValueOrDefault(key);
 
             Interlocked.Increment(ref _getCount);
-
-            if (value is null)
-            {
-                return null;
-            }
-
-            using var ms = new MemoryStream(value);
-            using var br = new BinaryReader(ms);
-
-            return new UserPaymentOperation
-            {
-                TransactionId = new Guid(br.ReadBytes(16)),
-                TransactionDate = DateTime.FromBinary(br.ReadInt64()),
-                UserId = br.ReadInt64()
-            };
         }
         finally
         {
             _lock.ExitReadLock();
         }
+
+        if (value is null)
+        {
+            return null;
+        }
+
+        using var ms = new MemoryStream(value);
+
+        return UserPaymentOperation.DeserializeFromBinary(ms);
     }
 
     public void Delete(string key)

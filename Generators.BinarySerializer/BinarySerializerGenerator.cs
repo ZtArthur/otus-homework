@@ -105,6 +105,35 @@ namespace Generators.BinarySerializer
             }
 
             code.AppendLine("        }");
+
+            if (symbol.InstanceConstructors.Any(c => c.Parameters.Length == 0 && c.DeclaredAccessibility == Accessibility.Public))
+            {
+                code.AppendLine();
+                code.AppendLine($"        public static {symbol.Name} DeserializeFromBinary(global::System.IO.Stream stream)");
+                code.AppendLine("        {");
+                code.AppendLine(
+                    "            using var br = new global::System.IO.BinaryReader(stream, global::System.Text.Encoding.UTF8, leaveOpen: true);"
+                );
+                code.AppendLine();
+                code.AppendLine($"            return new {symbol.Name}");
+                code.AppendLine("            {");
+
+                foreach (var property in properties)
+                {
+                    var brRead = GetReadByType(property);
+
+                    if (brRead is null)
+                    {
+                        continue;
+                    }
+
+                    code.AppendLine($"                {property.Name} = {brRead},");
+                }
+
+                code.AppendLine("            };");
+                code.AppendLine("        }");
+            }
+
             code.AppendLine("    }");
             code.AppendLine("}");
 
@@ -141,6 +170,43 @@ namespace Generators.BinarySerializer
                 {
                     "System.DateTime" => $"bw.Write({property.Name}.ToBinary());",
                     "System.Guid" => $"bw.Write({property.Name}.ToByteArray());",
+                    _ => null
+                }
+            };
+        }
+
+        private static string? GetReadByType(IPropertySymbol property)
+        {
+            if (property.SetMethod is null)
+            {
+                return null;
+            }
+
+            if (property.Type.TypeKind == TypeKind.Enum)
+            {
+                return $"({property.Type.ToDisplayString()})br.ReadInt32()";
+            }
+
+            return property.Type.SpecialType switch
+            {
+                SpecialType.System_Boolean => "br.ReadBoolean()",
+                SpecialType.System_Byte => "br.ReadByte()",
+                SpecialType.System_SByte => "br.ReadSByte()",
+                SpecialType.System_Int16 => "br.ReadInt16()",
+                SpecialType.System_UInt16 => "br.ReadUInt16()",
+                SpecialType.System_Int32 => "br.ReadInt32()",
+                SpecialType.System_UInt32 => "br.ReadUInt32()",
+                SpecialType.System_Int64 => "br.ReadInt64()",
+                SpecialType.System_UInt64 => "br.ReadUInt64()",
+                SpecialType.System_Single => "br.ReadSingle()",
+                SpecialType.System_Double => "br.ReadDouble()",
+                SpecialType.System_Decimal => "br.ReadDecimal()",
+                SpecialType.System_Char => "br.ReadChar()",
+                SpecialType.System_String => "br.ReadString()",
+                _ => property.Type.ToDisplayString() switch
+                {
+                    "System.DateTime" => "global::System.DateTime.FromBinary(br.ReadInt64())",
+                    "System.Guid" => "new global::System.Guid(br.ReadBytes(16))",
                     _ => null
                 }
             };

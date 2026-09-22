@@ -225,7 +225,7 @@ public class TcpServer
         }
     }
 
-    private static async Task SendResponseAsync(Socket socket, byte[] payload)
+    private static async Task SendResponseAsync(Socket socket, ReadOnlyMemory<byte> payload)
     {
         await socket.SendAsync(payload);
 
