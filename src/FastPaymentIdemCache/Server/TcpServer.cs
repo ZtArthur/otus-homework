@@ -102,7 +102,7 @@ public class TcpServer
                 var memory = new ReadOnlyMemory<byte>(array, start: 0, length);
                 var result = CommandParser.Parse(memory.Span);
 
-                var (command, key, _) = result.Decode();
+                var (command, key) = result.Decode();
 
                 switch (command)
                 {
@@ -183,7 +183,7 @@ public class TcpServer
                     default:
                         using (var activity = AppTelemetry.ActivitySource.StartActivity())
                         {
-                            activity?.SetTag(AppTelemetry.CommandTypeTagName, CommandType.UNKNOWN);
+                            activity?.SetTag(AppTelemetry.CommandTypeTagName, CommandType.ERROR);
                             activity?.SetTag(AppTelemetry.CommandLengthTagName, length);
 
                             var startTimestamp = Stopwatch.GetTimestamp();
@@ -192,9 +192,9 @@ public class TcpServer
 
                             await SendResponseAsync(clientSocket, ErrResponse);
 
-                            AppTelemetry.AddCommandProcessed(CommandType.UNKNOWN);
+                            AppTelemetry.AddCommandProcessed(CommandType.ERROR);
                             AppTelemetry.AddCommandExecutionTime(
-                                CommandType.UNKNOWN,
+                                CommandType.ERROR,
                                 Stopwatch.GetElapsedTime(startTimestamp).TotalSeconds
                             );
                         }

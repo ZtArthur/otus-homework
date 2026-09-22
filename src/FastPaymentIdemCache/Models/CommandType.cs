@@ -1,9 +1,9 @@
 ﻿namespace FastPaymentIdemCache.Models;
 
-public enum CommandType
+public static class CommandType
 {
-    UNKNOWN,
-    SET,
-    GET,
-    DELETE
+    public const string SET = "SET";
+    public const string GET = "GET";
+    public const string DELETE = "DELETE";
+    public const string ERROR = "ERROR";
 }
