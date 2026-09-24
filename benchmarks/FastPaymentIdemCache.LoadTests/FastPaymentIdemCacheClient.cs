@@ -1,4 +1,4 @@
-﻿using System.Net.Sockets;
+using System.Net.Sockets;
 using System.Text;
 
 namespace FastPaymentIdemCache.LoadTests;
@@ -11,6 +11,8 @@ public class FastPaymentIdemCacheClient : IDisposable
     private TcpClient? _client;
     private NetworkStream? _networkStream;
 
+    public bool IsConnected => _client?.Connected ?? false;
+
     public FastPaymentIdemCacheClient(string host, int port)
     {
         _host = host;
@@ -19,12 +21,9 @@ public class FastPaymentIdemCacheClient : IDisposable
 
     public async Task ConnectAsync()
     {
-        _client = new TcpClient(_host, _port);
+        _client = new TcpClient { NoDelay = true };
 
-        if (!_client.Connected)
-        {
-            await _client.ConnectAsync(_host, _port);
-        }
+        await _client.ConnectAsync(_host, _port);
 
         _networkStream = _client.GetStream();
     }
@@ -33,9 +32,13 @@ public class FastPaymentIdemCacheClient : IDisposable
     {
         ArgumentNullException.ThrowIfNull(_networkStream);
 
-        var command = $"SET {key} {Encoding.UTF8.GetString(value)}";
+        var prefix = Encoding.UTF8.GetBytes($"SET {key} ");
+        var command = new byte[prefix.Length + value.Length];
 
-        await WriteAsync(command);
+        prefix.CopyTo(command, index: 0);
+        value.CopyTo(command, prefix.Length);
+
+        await _networkStream.WriteAsync(command);
 
         return await ReadAsync();
     }
@@ -44,9 +47,7 @@ public class FastPaymentIdemCacheClient : IDisposable
     {
         ArgumentNullException.ThrowIfNull(_networkStream);
 
-        var command = $"GET {key}";
-
-        await WriteAsync(command);
+        await WriteAsync($"GET {key}");
 
         return await ReadAsync();
     }
@@ -64,7 +65,7 @@ public class FastPaymentIdemCacheClient : IDisposable
 
         var bytesRead = await _networkStream!.ReadAsync(buffer);
 
-        return bytesRead > 0 ? buffer : [];
+        return bytesRead > 0 ? buffer[..bytesRead] : [];
     }
 
     private async ValueTask WriteAsync(string payload)

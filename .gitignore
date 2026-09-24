@@ -363,5 +363,16 @@ MigrationBackup/
 
 # Source generator output (EmitCompilerGeneratedFiles) and local NuGet config
 **/Generated/
-
+.mimosa/
+.zcode/
+reports/
 NuGet.Config
+
+# AI agent artifacts
+.zcodeignore
+skills-lock.json
+
+# Local working materials (not for repository)
+docs/
+observability/
+presentation/

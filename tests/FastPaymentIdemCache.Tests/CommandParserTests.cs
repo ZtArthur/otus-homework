@@ -96,5 +96,37 @@ public class CommandParserTests
         Assert.True(expected.Equals(actual));
     }
 
+    [Fact]
+    public void should_decode_set_command_to_constant_and_key()
+    {
+        var result = CommandParser.Parse(GetSpanBytes("SET user:1 data"));
+
+        var (command, key) = result.Decode();
+
+        Assert.Equal(CommandType.SET, command);
+        Assert.Equal("user:1", key);
+    }
+
+    [Fact]
+    public void should_decode_get_and_delete_commands_to_constants()
+    {
+        var (getCommand, getKey) = CommandParser.Parse(GetSpanBytes("GET user:1")).Decode();
+        var (deleteCommand, deleteKey) = CommandParser.Parse(GetSpanBytes("DELETE user:1")).Decode();
+
+        Assert.Equal(CommandType.GET, getCommand);
+        Assert.Equal(CommandType.DELETE, deleteCommand);
+        Assert.Equal("user:1", getKey);
+        Assert.Equal("user:1", deleteKey);
+    }
+
+    [Fact]
+    public void should_decode_unknown_command_to_error_constant()
+    {
+        var (command, key) = CommandParser.Parse(GetSpanBytes("PING user:1")).Decode();
+
+        Assert.Equal(CommandType.ERROR, command);
+        Assert.Equal("user:1", key);
+    }
+
     private static Span<byte> GetSpanBytes(string inputStr) => Encoding.UTF8.GetBytes(inputStr).AsSpan();
 }

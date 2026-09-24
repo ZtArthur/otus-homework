@@ -11,16 +11,16 @@ namespace FastPaymentIdemCache.Benchmarks
     [MemoryDiagnoser]
     public class SerializationBenchmarks
     {
-        private UserProfile _profile = null!;
+        private UserPaymentOperation _operation = null!;
 
         [GlobalSetup]
         public void Setup()
         {
-            _profile = new UserProfile
+            _operation = new UserPaymentOperation
             {
-                Id = 1031,
-                CreatedAt = DateTime.Now,
-                Username = "user-benchmark"
+                TransactionId = Guid.NewGuid(),
+                TransactionDate = DateTime.Now,
+                UserId = 1031
             };
         }
 
@@ -28,7 +28,7 @@ namespace FastPaymentIdemCache.Benchmarks
         public byte[] SystemTextJson()
         {
             using var ms = new MemoryStream();
-            JsonSerializer.Serialize(ms, _profile);
+            JsonSerializer.Serialize(ms, _operation);
 
             return ms.ToArray();
         }
@@ -37,7 +37,7 @@ namespace FastPaymentIdemCache.Benchmarks
         public byte[] GenerateBinary()
         {
             using var ms = new MemoryStream();
-            _profile.SerializeToBinary(ms);
+            _operation.SerializeToBinary(ms);
 
             return ms.ToArray();
         }

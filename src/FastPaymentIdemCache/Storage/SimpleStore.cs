@@ -1,5 +1,4 @@
-﻿using System.Text.Json;
-using FastPaymentIdemCache.Models;
+﻿using FastPaymentIdemCache.Models;
 
 namespace FastPaymentIdemCache.Storage;
 
@@ -12,7 +11,7 @@ public sealed class SimpleStore : IDisposable
     private long _getCount;
     private long _deleteCount;
 
-    public void Set(string key, UserProfile profile)
+    public void Set(string key, UserPaymentOperation operation)
     {
         ArgumentException.ThrowIfNullOrEmpty(key);
 
@@ -21,8 +20,8 @@ public sealed class SimpleStore : IDisposable
             _lock.EnterWriteLock();
 
             using var ms = new MemoryStream();
-            
-            profile.SerializeToBinary(ms);
+
+            operation.SerializeToBinary(ms);
             
             _store[key] = ms.ToArray();
 
@@ -34,26 +33,33 @@ public sealed class SimpleStore : IDisposable
         }
     }
 
-    public UserProfile? Get(string key)
+    public UserPaymentOperation? Get(string key)
     {
         ArgumentException.ThrowIfNullOrEmpty(key);
+
+        byte[]? value;
 
         try
         {
             _lock.EnterReadLock();
 
-            var value = _store.GetValueOrDefault(key);
+            value = _store.GetValueOrDefault(key);
 
             Interlocked.Increment(ref _getCount);
-
-            return value is null
-                ? null
-                : JsonSerializer.Deserialize<UserProfile>(value);
         }
         finally
         {
             _lock.ExitReadLock();
         }
+
+        if (value is null)
+        {
+            return null;
+        }
+
+        using var ms = new MemoryStream(value);
+
+        return UserPaymentOperation.DeserializeFromBinary(ms);
     }
 
     public void Delete(string key)
@@ -71,6 +77,23 @@ public sealed class SimpleStore : IDisposable
         finally
         {
             _lock.ExitWriteLock();
+        }
+    }
+
+    public int Count
+    {
+        get
+        {
+            _lock.EnterReadLock();
+
+            try
+            {
+                return _store.Count;
+            }
+            finally
+            {
+                _lock.ExitReadLock();
+            }
         }
     }
 
