@@ -375,4 +375,4 @@ skills-lock.json
 # Local working materials (not for repository)
 docs/
 observability/
-presentation/
+*.mp4
